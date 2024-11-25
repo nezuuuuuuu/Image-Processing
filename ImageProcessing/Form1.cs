@@ -58,6 +58,11 @@ namespace ImageProcessing
                     pictureBoxOriginal.Image = originalImage;
                     processedImage = new Bitmap(originalImage);
                     pictureBoxProcessed.Image = processedImage;
+
+                    trackBar1.Value = 0;
+                    trackBar2.Value = 0;    
+                    trackBar3.Value = 0;
+                    trackBar4.Value = 0;
                 }
             }
         }
@@ -443,27 +448,28 @@ namespace ImageProcessing
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
+            
             ConvolutionMatrixMethods.Smooth(processedImage, trackBar1.Value);
             pictureBoxProcessed.Image=processedImage;
         }
 
         private void trackBar2_Scroll(object sender, EventArgs e)
         {
-            ConvolutionMatrixMethods.GaussianBlur(processedImage, trackBar1.Value);
+            ConvolutionMatrixMethods.GaussianBlur(processedImage, trackBar2.Value);
             pictureBoxProcessed.Image = processedImage;
 
         }
 
         private void trackBar3_Scroll(object sender, EventArgs e)
         {
-            ConvolutionMatrixMethods.MeanRemoval(processedImage, trackBar1.Value);
+            ConvolutionMatrixMethods.MeanRemoval(processedImage, trackBar3.Value);
             pictureBoxProcessed.Image = processedImage;
 
         }
 
         private void trackBar4_Scroll(object sender, EventArgs e)
         {
-            ConvolutionMatrixMethods.Sharpen(processedImage, trackBar1.Value);
+            ConvolutionMatrixMethods.Sharpen(processedImage, trackBar4.Value);
             pictureBoxProcessed.Image = processedImage;
 
         }
@@ -473,6 +479,15 @@ namespace ImageProcessing
             ConvolutionMatrixMethods.EmbossLaplacian(processedImage);
 
         }
+
+        private void changesOnTrackBars() { 
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
     }
 
 

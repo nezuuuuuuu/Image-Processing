@@ -355,6 +355,7 @@
             this.Controls.Add(this.pictureBoxOriginal);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOriginal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxProcessed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxResult)).EndInit();
