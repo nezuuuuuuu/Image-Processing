@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
-
+using ImageProcessing;
 
 namespace ImageProcessing
 {
@@ -306,9 +306,7 @@ namespace ImageProcessing
         }
     }
 
-        // Start the webcam when the button is clicked
 
-        // Handle new frames from the webcam
         private void videoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             // Clone the current frame (in a thread-safe manner)
@@ -356,8 +354,54 @@ namespace ImageProcessing
         StopWebcam();
     }
 
-    // Method to stop the webcam
-    private void StopWebcam()
+
+        public static bool Binary(Bitmap src, Bitmap dst, int threshold)
+        {
+            if (threshold < 0 || threshold > 255)
+                return false;
+
+            int dstHeight = dst.Height;
+            int dstWidth = dst.Width;
+            int srcHeight = src.Height;
+            int srcWidth = src.Width;
+
+            BitmapData bmLoaded = src.LockBits(
+                new Rectangle(0, 0, srcWidth, srcHeight),
+                ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb
+                );
+
+            BitmapData bmProcessed = dst.LockBits(
+                new Rectangle(0, 0, dstWidth, dstHeight),
+                ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb
+                );
+
+            unsafe
+            {
+                int paddingProcessed = bmProcessed.Stride - dstWidth * 3;
+                int paddingLoaded = bmLoaded.Stride - srcWidth * 3;
+
+                byte* pProcessed = (byte*)bmProcessed.Scan0;
+                byte* pLoaded = (byte*)bmLoaded.Scan0;
+
+                for (int i = 0;
+                    i < srcHeight;
+                    i++, pProcessed += paddingProcessed, pLoaded += paddingLoaded)
+
+                    for (int j = 0;
+                        j < srcWidth;
+                        j++, pProcessed += 3, pLoaded += 3)
+                        pProcessed[0] = pProcessed[1] = pProcessed[2] = (byte)(
+                            (pLoaded[0] + pLoaded[1] + pLoaded[2]) / 3 < threshold ? 0 : 255);
+            }
+
+            src.UnlockBits(bmLoaded);
+            dst.UnlockBits(bmProcessed);
+
+            return true;
+        }
+
+        // Method to stop the webcam
+        private void StopWebcam()
     {
         if (videoSource != null && videoSource.IsRunning)
         {
@@ -368,6 +412,69 @@ namespace ImageProcessing
             cameratoggle.Text = "turn on camera";
             pictureBoxProcessed.Image=null;
     }
-}
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CountCoinsBtn_Click(object sender, EventArgs e)
+        {
+     
+            Binary(originalImage, processedImage,200);
+            Coins.CountCoins(processedImage, ref countlabel,ref  valuelabel);
+            pictureBoxProcessed.Image = processedImage;
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            processedImage = new Bitmap(originalImage);
+            ConvolutionMatrix cm = new ConvolutionMatrix();
+            cm.setEmboss(2);
+            ConvolutionMatrixMethods.Conv3x3(processedImage, cm);
+            pictureBoxProcessed.Image = processedImage;
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            ConvolutionMatrixMethods.Smooth(processedImage, trackBar1.Value);
+            pictureBoxProcessed.Image=processedImage;
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            ConvolutionMatrixMethods.GaussianBlur(processedImage, trackBar1.Value);
+            pictureBoxProcessed.Image = processedImage;
+
+        }
+
+        private void trackBar3_Scroll(object sender, EventArgs e)
+        {
+            ConvolutionMatrixMethods.MeanRemoval(processedImage, trackBar1.Value);
+            pictureBoxProcessed.Image = processedImage;
+
+        }
+
+        private void trackBar4_Scroll(object sender, EventArgs e)
+        {
+            ConvolutionMatrixMethods.Sharpen(processedImage, trackBar1.Value);
+            pictureBoxProcessed.Image = processedImage;
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ConvolutionMatrixMethods.EmbossLaplacian(processedImage);
+
+        }
+    }
+
+
 
 }
